@@ -1,14 +1,14 @@
 ﻿@page "/"
-@using BlazorWebEngine.Application
+@using BlazorWebEngine.Classes
 
 <div>
-@{ @StartApp.RenderComponents();}
+@{ @RootComponent.RenderElements();}
 </div>
 
 @code
 {
     [Inject]
-    public StartApp StartApp { get; set; }
+    public RootComponent RootComponent { get; set; }
 
 
     protected override void OnInitialized()
