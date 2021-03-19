@@ -7,22 +7,10 @@ namespace BlazorWebEngine.Management.ElementHandling
     public class ElementInformation
     {
         /// <summary>
-        /// MapType
+        /// ElementDataMap contains the composite objects of an element.
         /// </summary>
         public Dictionary<Type, Dictionary<int, object>> ElementDataMap = new();
 
-        /// <summary>
-        /// Add Data of a Type to the ElementDataMap associated with the id of the element.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="data"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        private T AddElementData<T>(int id) where T: new()
-        {
-            return AddElementData<T>(id, new T());
-        }
-        
         private T AddElementData<T>(int id, T data) where T: new()
         {
             Type mapKey = typeof(T);
@@ -38,9 +26,34 @@ namespace BlazorWebEngine.Management.ElementHandling
             
             return data;
         }
+        
+        private T AddElementData<T>(int id) where T: new() => AddElementData<T>(id, new T());
 
+        /// <summary>
+        /// Retrieve data of a type from the ElementDataMap associated with the id of the element.
+        /// </summary>
+        /// <param name="elementBase"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetElementData<T>(ElementBase elementBase)  where T : new() => GetElementData<T>(elementBase.Id);
+        
+        /// <summary>
+        /// Add default data of a type to the ElementDataMap associated with the id of the element.
+        /// </summary>
+        /// <param name="elementBase"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public T AddElementData<T>(ElementBase elementBase) where T: new() => AddElementData<T>(elementBase.Id);
+        
+        /// <summary>
+        /// Add data of a type to the ElementDataMap associated with the id of the element.
+        /// </summary>
+        /// <param name="elementBase"></param>
+        /// <param name="data"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public T AddElementData<T>(ElementBase elementBase, T data) where T: new() => AddElementData<T>(elementBase.Id, data);
+        
 
         private T GetElementData<T>(int id) where T: new()
         {
@@ -51,6 +64,6 @@ namespace BlazorWebEngine.Management.ElementHandling
             }
             return (T) ElementDataMap[type][id];  
         } 
-        public T GetElementData<T>(ElementBase elementBase)  where T : new() => GetElementData<T>(elementBase.Id);
+        
     }
 }

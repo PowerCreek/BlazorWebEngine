@@ -16,7 +16,7 @@ namespace BlazorWebEngine.Classes
         public TestElement(int id, OperationManager operationManager,  ElementInformation elementInformation) : 
             base(id, operationManager, elementInformation)
         {
-
+            
             Transform.Position = new Vector2(100,100);
             Transform.Size = new Vector2(200, 200);
             
@@ -26,6 +26,7 @@ namespace BlazorWebEngine.Classes
         public override void Instantiate()
         {
             OperationManager.GetOperation<StyleOperator>();
+            
         }
     }
 }
