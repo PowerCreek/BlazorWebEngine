@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -7,74 +8,44 @@ using BlazorWebEngine.Management;
 
 namespace BlazorWebEngine.Classes
 {
-    
-    public interface IChangedProperty<T>
-    {
-        public delegate void ElementPropertyChangedHandler(object sender, ElementArgs<T> e);
-        public event ElementPropertyChangedHandler PropertyChanged;
-        public void OnPropertyChanged(ElementProperty<T> self, object value);
-    }
-
-    public class ElementProperty<T> : IChangedProperty<T>
-    {
-        public event IChangedProperty<T>.ElementPropertyChangedHandler PropertyChanged;
-        public virtual void OnPropertyChanged(ElementProperty<T> self, object value)
-        {
-            string name = new StackTrace().GetFrame(1)?.GetMethod()?.Name.Split('_')[1];
-            PropertyChanged?.Invoke(this, new ElementArgs<T>(name, self, value));
-        }
-    }
-
-    public class ElementArgs<T> : PropertyChangedEventArgs
-    {
-        public T Arguments { get; init; }
-        
-        public readonly dynamic Value;
-        
-        public ElementArgs(string name, object arguments, object value) : base(name)
-        {
-            Arguments = (T) arguments;
-            Value = value;
-        }
-
-        public T GetArgs()
-        {
-            return Arguments;
-        }
-    }
-
-    public class TransformArgs : ElementArgs<Transform>
-    {
-        
-        public TransformArgs(string name, Transform elementProperty, object value) : base(name, elementProperty, value)
-        {
-        }
-    }
-    
-    public class Transform : ElementProperty<Transform>
+    public class Transform
     {
         private Vector2 _position;
         private Vector2 _size;
-
+        
         public Vector2 Position
         {
             get => _position;
-            set
-            {
-                _position = value;
-                OnPropertyChanged(this, value);
-            }
+            set => OnMove?.Invoke(nameof(Position),this, _position=value);
         }
 
         public Vector2 Size
         {
             get => _size;
-            set
-            {
-                _size = value;
-                OnPropertyChanged(this, value);
-            }
+            set => OnResize?.Invoke(nameof(Size),this, _size=value);
         }
+
+        public void SetPositionSize(int x, int y, int w, int h)
+        {
+            SetPositionSize(new Vector2(x, y),new Vector2(w,h));
+        }
+
+        public void SetPositionSize(Vector2 position, Vector2 size)
+        {
+            _position = position;
+            Size = size;
+        }
+
+        public IChangedProperty<Transform, Vector2>.ElementPropertyChangedHandler OnMove =
+            (string s, Transform t, Vector2 value) =>
+            {
+
+            };
         
+        public IChangedProperty<Transform, Vector2>.ElementPropertyChangedHandler OnResize =
+            (string s, Transform t, Vector2 value) =>
+            {
+
+            };
     }
 }

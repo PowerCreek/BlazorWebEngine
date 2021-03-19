@@ -16,13 +16,11 @@ namespace BlazorWebEngine.Classes
         public TestElement(int id, OperationManager operationManager,  ElementInformation elementInformation) : 
             base(id, operationManager, elementInformation)
         {
-            Transform.PropertyChanged += (sender, obj) =>
-            {
-                
-                Console.WriteLine(obj.Value);
-            };
+
             Transform.Position = new Vector2(100,100);
             Transform.Size = new Vector2(200, 200);
+            
+            Transform.SetPositionSize(new Vector2(50,50), new Vector2(100,150));
         }
         
         public override void Instantiate()
