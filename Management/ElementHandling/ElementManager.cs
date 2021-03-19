@@ -17,16 +17,14 @@ namespace BlazorWebEngine.Management.ElementHandling
 
         public void GenerateItem<T>(OperationManager operationManager) where T : IInstance
         {
-            IInstance item = (IInstance) Activator.CreateInstance(typeof(T), operationManager);
+            IInstance item = (IInstance) Activator.CreateInstance(typeof(T), ElementRegistry.AddElement(), operationManager, ElementInformation);
             GenerateItem<T>(item);
-            
         }
 
         private void GenerateItem<T>(object t) where T: IInstance
         {
             if (!(t is ElementBase hold)) return;
-            hold.Instantiate(this);
-            hold.id = ElementRegistry.AddElement();
+            hold.Instantiate();
         }
     }
     

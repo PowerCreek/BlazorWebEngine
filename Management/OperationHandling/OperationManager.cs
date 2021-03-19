@@ -12,15 +12,12 @@ namespace BlazorWebEngine.Management.OperationHandling
 
         public Dictionary<Type, OperationBase> OperationMap = new();
         
-        public OperationManager()
-        {
-        }
+        public OperationManager() {  }
 
         public T GetOperation<T>() where T: OperationBase
         {
             if (OperationMap.TryGetValue(typeof(T), out OperationBase obj))
             {
-                
                 return (T) obj;
             }
 

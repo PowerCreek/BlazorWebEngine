@@ -1,4 +1,5 @@
-﻿using BlazorWebEngine.Management;
+﻿using System;
+using BlazorWebEngine.Management;
 using BlazorWebEngine.Management.ElementHandling;
 using BlazorWebEngine.Management.OperationHandling;
 using Microsoft.AspNetCore.Components;
@@ -15,7 +16,6 @@ namespace BlazorWebEngine.Classes
         public void Init(ElementManager elementManager, OperationManager operationManager)
         {
             elementManager.GenerateItem<TestElement>(operationManager);
-            
         }
         
         public RenderFragment RenderElements()

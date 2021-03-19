@@ -1,21 +1,33 @@
 ﻿using System;
+using System.Numerics;
 using BlazorWebEngine.Management;
 using BlazorWebEngine.Management.ElementHandling;
 using BlazorWebEngine.Management.OperationHandling;
+using Newtonsoft.Json.Linq;
 
 namespace BlazorWebEngine.Classes
 {
+    
     public class TestElement : ElementBase
     {
-
-        public TestElement(OperationManager operationManager)
+        
+        public Transform Transform => ElementInformation.GetElementData<Transform>(this);
+        
+        public TestElement(int id, OperationManager operationManager,  ElementInformation elementInformation) : 
+            base(id, operationManager, elementInformation)
         {
-            operationManager.GetOperation<StyleOperator>();
+            Transform.PropertyChanged += (sender, obj) =>
+            {
+                
+                Console.WriteLine(obj.Value);
+            };
+            Transform.Position = new Vector2(100,100);
+            Transform.Size = new Vector2(200, 200);
         }
         
-        public override void Instantiate(ElementManager elementManager)
+        public override void Instantiate()
         {
-            Console.WriteLine("do thing TestElement");
+            OperationManager.GetOperation<StyleOperator>();
         }
     }
 }

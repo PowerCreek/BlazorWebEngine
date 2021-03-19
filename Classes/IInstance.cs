@@ -5,6 +5,6 @@ namespace BlazorWebEngine.Classes
 {
     public interface IInstance
     {
-        public void Instantiate(ElementManager elementManager);
+        public void Instantiate();
     }
 }
