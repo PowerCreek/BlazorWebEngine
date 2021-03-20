@@ -11,7 +11,7 @@ using Microsoft.JSInterop;
 using BlazorWebEngine;
 using BlazorWebEngine.Classes;
 using BlazorWebEngine.Management;
-using BlazorWebEngine.Management.ElementHandling;
+using BlazorWebEngine.Management.NodeHandling;
 using BlazorWebEngine.Management.OperationHandling;
 
 namespace BlazorWebEngine
@@ -25,14 +25,15 @@ namespace BlazorWebEngine
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             
+            builder.Services.AddScoped<OperationManager>();
+
             builder.Services.AddScoped<BackingService>();
             builder.Services.AddScoped<IBuilder, BackingServiceBuilder>();
             
-            builder.Services.AddScoped<OperationManager>();
             
-            builder.Services.AddScoped<ElementRegistry>();
-            builder.Services.AddScoped<ElementInformation>();
-            builder.Services.AddScoped<ElementManager>();
+            builder.Services.AddScoped<NodeRegistry>();
+            builder.Services.AddScoped<NodeInformation>();
+            builder.Services.AddScoped<NodeManager>();
             
             builder.Services.AddScoped<RootComponent>();
 

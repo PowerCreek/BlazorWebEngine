@@ -1,6 +1,6 @@
-﻿namespace BlazorWebEngine.Management.ElementHandling
+﻿namespace BlazorWebEngine.Management.NodeHandling
 {
-    public class Element
+    public class Node
     {
         public int Id { get; init; }
         public int ParentId;

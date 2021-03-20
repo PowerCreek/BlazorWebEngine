@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 
-namespace BlazorWebEngine.Management.ElementHandling
+namespace BlazorWebEngine.Management.NodeHandling
 {
-    public class ElementRegistry : IRegisterElement
+    public class NodeRegistry : IRegisterElement
     {
         public int Indexor = 0;
         public readonly HashSet<int> ElementMap = new HashSet<int>();
         
-        public virtual int AddElement()
+        public virtual int AddNode()
         {
             int id = Indexor++;
             ElementMap.Add(id);

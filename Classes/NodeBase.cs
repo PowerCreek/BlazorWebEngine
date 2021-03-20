@@ -1,24 +1,24 @@
 ﻿using System;
 using BlazorWebEngine.Management;
-using BlazorWebEngine.Management.ElementHandling;
+using BlazorWebEngine.Management.NodeHandling;
 using BlazorWebEngine.Management.OperationHandling;
 
 namespace BlazorWebEngine.Classes
 {
-    public class ElementBase : IInstance
+    public class NodeBase : IInstance
     {
 
         public int Id { get; set; }
         public int Parent { get; set; }
         
         public OperationManager OperationManager;
-        public ElementInformation ElementInformation;
+        public NodeInformation NodeInformation;
         
-        public ElementBase(int id, OperationManager operationManager, ElementInformation elementInformation)
+        public NodeBase(int id, OperationManager operationManager, NodeInformation nodeInformation)
         {
             Id = id;
             OperationManager = operationManager;
-            ElementInformation = elementInformation;
+            NodeInformation = nodeInformation;
         }
         
         public virtual void Instantiate()

@@ -9,10 +9,14 @@ namespace BlazorWebEngine.Management.OperationHandling
     /// </summary>
     public class OperationManager
     {
-
-        public Dictionary<Type, OperationBase> OperationMap = new();
+        public IJSRuntime JsRuntime;
         
-        public OperationManager() {  }
+        public Dictionary<Type, OperationBase> OperationMap = new();
+
+        public OperationManager(IJSRuntime jsRuntime)
+        {
+            JsRuntime = jsRuntime;
+        }
 
         public T GetOperation<T>() where T: OperationBase
         {
@@ -22,7 +26,7 @@ namespace BlazorWebEngine.Management.OperationHandling
             }
 
             T hold;
-            OperationMap.Add(typeof(T),hold=Activator.CreateInstance<T>());
+            OperationMap.Add(typeof(T),hold = (T)Activator.CreateInstance(typeof(T),JsRuntime));
             hold.MakeOperator();
             return hold;
         }

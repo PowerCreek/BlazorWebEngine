@@ -1,51 +1,227 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Numerics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using BlazorWebEngine.Annotations;
-using BlazorWebEngine.Management;
 
 namespace BlazorWebEngine.Classes
 {
-    public class Transform
+
+    public abstract class ActionCall
     {
-        private Vector2 _position;
-        private Vector2 _size;
+
+        public abstract void SetParameters(object a, object b);
+
+    }
+    
+    public class ActionCall<T,V> : ActionCall where T: class 
+    {
+
+        private Action<T,V> _InvokeAction = (t,v) => { };
+
+        public T Source { get; set; }
+        public V Value { get; set; }
         
-        public Vector2 Position
+        public void Invoke(T a, V b)
         {
-            get => _position;
-            set => OnMove?.Invoke(nameof(Position),this, _position=value);
+            SetParameters(a,b);
+            _InvokeAction(a,b);
         }
 
-        public Vector2 Size
+        public override void SetParameters(object a, object b)
+        {
+            Source = (T)a;
+            Value = (V) b;
+        }
+
+        public Action<T, V> Append
+        {
+            set => _InvokeAction += value;
+        }
+    } 
+    
+    public class ElementProperty<T> where T: class
+    {
+
+        public Dictionary<string, ActionCall> PropertyChangedMap = new();
+
+        
+        public ActionCall<T,V> GetPropertyActionCall<V>()
+        {
+            string name = new StackTrace().GetFrame(1)?.GetMethod()?.Name.Split('_')[1];
+            if (PropertyChangedMap.TryGetValue(name, out var hold))
+            {
+                return hold as ActionCall<T,V>;
+            }
+            
+            var action = Activator.CreateInstance<ActionCall<T,V>>();
+            PropertyChangedMap.Add(name, action);
+            
+            return action;
+        }
+    }
+
+    public class Vector : INotifyPropertyChanged, IEquatable<int[]>
+    {
+        protected int[] values = {0, 0};
+        
+        public Vector()
+        {
+        }
+        public Vector(int a, int b)
+        {
+            values[0] = a;
+            values[1] = b;
+        }
+        
+        
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public bool Equals(int[] other)
+        {
+            return other != null && Enumerable.SequenceEqual(values, other);
+        }
+    }
+
+    public class Position : Vector
+    {
+        public int X
+        {
+            get => values[0];
+            set
+            {
+                if (values[0] != value)
+                {
+                    values[0] = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public int Y
+        {
+            get => values[1];
+            set
+            {
+                if (values[1] == value) return;
+                values[1] = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        public Position() : this(0,0)
+        {
+        }
+        public Position(int x, int y) :base(x,y)
+        {
+        }
+        
+    }
+    public class Size : Vector
+    {
+        public int Width
+        {
+            get => values[0];
+            set
+            {
+                if (values[0] == value) return;
+                values[0] = value;
+                OnPropertyChanged();
+            }
+        }
+        public int Height
+        {
+            get => values[1];
+            set
+            {
+                if (values[1] == value) return;
+                values[1] = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Size() : this(0, 0)
+        {
+            
+        }
+        
+        public Size(int width, int height) :base(width,height)
+        {
+        }
+    }
+    
+    
+    public class Transform : ElementProperty<Transform>
+    {
+        
+        public Transform() : base()
+        {
+            Position = new();
+            Size = new();
+        }
+        
+        private Size _size = new Size();
+        public Size Size
         {
             get => _size;
-            set => OnResize?.Invoke(nameof(Size),this, _size=value);
+            set
+            {
+                if (_size.Equals(value)) return;
+                _size = value;
+                _size.PropertyChanged += (a,b)=>
+                {
+                    OnResize?.Invoke(this, _size);
+                };
+                OnResize?.Invoke(this,_size);
+            }
         }
 
-        public void SetPositionSize(int x, int y, int w, int h)
+        public Action<Transform,Size> OnResize
         {
-            SetPositionSize(new Vector2(x, y),new Vector2(w,h));
+            get => GetPropertyActionCall<Size>().Invoke;
+            set => GetPropertyActionCall<Size>().Append=(value);
+        }
+        
+        private Position _position = new Position();
+
+        public Position Position
+        {
+            get => _position;
+            set
+            {
+                if (_position.Equals(value)) return;
+                _position = value;
+                _position.PropertyChanged += (a,b)=>
+                {
+                    OnMove?.Invoke(this, _position);
+                    Console.WriteLine("setting property of position");
+                };
+                OnMove?.Invoke(this, _position);
+                Console.WriteLine("setting position");
+            }
         }
 
-        public void SetPositionSize(Vector2 position, Vector2 size)
+        public Action<Transform, Position> OnMove
+        {
+            get => GetPropertyActionCall<Position>().Invoke;
+            set => GetPropertyActionCall<Position>().Append=(value);
+        }
+        
+        public void SetPositionSize(int x, int y, int w, int h) => SetPositionSize(new Position(x, y), new Size(w,h));
+
+        public void SetPositionSize(Position position, Size size)
         {
             _position = position;
             Size = size;
         }
-
-        public IChangedProperty<Transform, Vector2>.ElementPropertyChangedHandler OnMove =
-            (string s, Transform t, Vector2 value) =>
-            {
-
-            };
-        
-        public IChangedProperty<Transform, Vector2>.ElementPropertyChangedHandler OnResize =
-            (string s, Transform t, Vector2 value) =>
-            {
-
-            };
     }
 }

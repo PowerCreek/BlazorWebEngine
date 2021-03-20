@@ -1,10 +1,8 @@
-﻿using BlazorWebEngine.Management.ElementHandling;
-
-namespace BlazorWebEngine.Management
+﻿namespace BlazorWebEngine.Management
 {
     public interface IRegisterElement
     {
-        public int AddElement();
+        public int AddNode();
         public void RemoveElement(int id);
     }
 }
