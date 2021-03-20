@@ -4,6 +4,7 @@ using Microsoft.JSInterop;
 
 namespace BlazorWebEngine.Management.OperationHandling
 {
+    
     /// <summary>
     /// Rename this to not use 'Operator' in the name
     /// </summary>

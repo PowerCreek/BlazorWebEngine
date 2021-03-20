@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BlazorWebEngine.Management.OperationHandling;
 
-namespace BlazorWebEngine.Classes
+namespace BlazorWebEngine.Classes.Contexts
 {
     public class StyleContext
     {
@@ -55,7 +55,7 @@ namespace BlazorWebEngine.Classes
         }
         
         private string CreateOutput()
-        { 
+        {
             Output = string.Join(';', StyleMap.Select(e => $"{e.Key}:{e.Value}"));
             //Console.WriteLine(Output);
             return Output;

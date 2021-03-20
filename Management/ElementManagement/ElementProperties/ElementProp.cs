@@ -1,4 +1,4 @@
-﻿namespace BlazorWebEngine.Management.ElementManagement
+﻿namespace BlazorWebEngine.Management.ElementManagement.ElementProperties
 {
     public class ElementProp
     {

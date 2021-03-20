@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Components.Rendering;
 
 namespace BlazorWebEngine.Management.ElementManagement
 {
-    public class ElementContext : ElementProperties
+    public class ElementContext : ElementProperties.ElementProperties
     {
-        public ElementContext(string id, Action<ElementProperties> action) : base(id)
+        public ElementContext(string id, Action<ElementProperties.ElementProperties> action) : base(id)
         {
             Id = id;
             action(this);

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Rendering;
 
-namespace BlazorWebEngine.Classes
+namespace BlazorWebEngine.Interfaces
 {
     public interface IRenderable
     {

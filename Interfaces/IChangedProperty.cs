@@ -1,4 +1,4 @@
-﻿namespace BlazorWebEngine.Classes
+﻿namespace BlazorWebEngine.Interfaces
 {
     public interface IChangedProperty<T, V>
     {

@@ -1,6 +1,4 @@
-﻿using BlazorWebEngine.Management;
-
-namespace BlazorWebEngine.Classes
+﻿namespace BlazorWebEngine.Interfaces
 {
     public interface IInstance
     {

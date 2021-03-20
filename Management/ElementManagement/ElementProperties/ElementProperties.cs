@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BlazorWebEngine.Management.ElementManagement
+namespace BlazorWebEngine.Management.ElementManagement.ElementProperties
 {
     public class ElementProperties
     {

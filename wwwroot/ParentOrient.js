@@ -5,7 +5,5 @@ function SetParent(parentSelector, childSelector){
 }
 
 function SetStyles(elementId, styleKey, styleValue){
-    console.log(elementId)
-    console.log(styleKey)
-    console.log(styleValue)
+    document.getElementById(elementId).style[styleKey]=styleValue
 }

@@ -1,30 +1,41 @@
 ﻿using System;
 using BlazorWebEngine.Classes;
+using BlazorWebEngine.Components;
+using BlazorWebEngine.Interfaces;
 using BlazorWebEngine.Management.OperationHandling;
 
 namespace BlazorWebEngine.Management.NodeHandling
 {
     public class NodeManager
     {
-        public NodeRegistry NodeRegistry { get; set; }
-        public NodeInformation NodeInformation { get; set; }
+        public IElementServices ElementServices { get; init; }
         
-        public NodeManager(NodeRegistry nodeRegistry, NodeInformation nodeInformation)
+        public NodeManager(IElementServices elementServices)
         {
-            NodeRegistry = nodeRegistry;
-            NodeInformation = nodeInformation;
+            Console.WriteLine(elementServices.id);
+            ElementServices = elementServices;
         }
 
-        public T GenerateItem<T>(OperationManager operationManager) where T : IInstance
+        /// <summary>
+        /// Automatically creates an instead of T.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GenerateItem<T>() where T : IInstance
         {
-            IInstance item = (IInstance) Activator.CreateInstance(typeof(T), NodeRegistry.AddNode(), operationManager, NodeInformation);
+            IInstance item = (IInstance) Activator.CreateInstance(typeof(T), ElementServices);
             GenerateItem<T>(item);
             return (T)item;
         }
 
-        private void GenerateItem<T>(object t) where T: IInstance
+        /// <summary>
+        /// If the item is a NodeBase type, .Instantiate() will be called on it.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <typeparam name="T"></typeparam>
+        private void GenerateItem<T>(object item) where T: IInstance
         {
-            if (!(t is NodeBase hold)) return;
+            if (!(item is NodeBase hold)) return;
             hold.Instantiate();
         }
     }

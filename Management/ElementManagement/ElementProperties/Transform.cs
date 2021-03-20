@@ -4,9 +4,9 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using BlazorWebEngine.Annotations;
+using BlazorWebEngine.Properties;
 
-namespace BlazorWebEngine.Classes
+namespace BlazorWebEngine.Management.ElementManagement.ElementProperties
 {
 
     public abstract class ActionCall
@@ -19,7 +19,7 @@ namespace BlazorWebEngine.Classes
     public class ActionCall<T,V> : ActionCall where T: class 
     {
 
-        private Action<T,V> _InvokeAction = (t,v) => { };
+        public Action<T,V> Action = (t,v) => { };
 
         public T Source { get; set; }
         public V Value { get; set; }
@@ -27,18 +27,13 @@ namespace BlazorWebEngine.Classes
         public void Invoke(T a, V b)
         {
             SetParameters(a,b);
-            _InvokeAction(a,b);
+            Action(a,b);
         }
 
         public override void SetParameters(object a, object b)
         {
             Source = (T)a;
             Value = (V) b;
-        }
-
-        public Action<T, V> Append
-        {
-            set => _InvokeAction += value;
         }
     } 
     
@@ -188,7 +183,7 @@ namespace BlazorWebEngine.Classes
         public Action<Transform,Size> OnResize
         {
             get => GetPropertyActionCall<Size>().Invoke;
-            set => GetPropertyActionCall<Size>().Append=(value);
+            set => GetPropertyActionCall<Size>().Action+=value;
         }
         
         private Position _position = new Position();
@@ -213,7 +208,7 @@ namespace BlazorWebEngine.Classes
         public Action<Transform, Position> OnMove
         {
             get => GetPropertyActionCall<Position>().Invoke;
-            set => GetPropertyActionCall<Position>().Append=(value);
+            set => GetPropertyActionCall<Position>().Action=(value);
         }
         
         public void SetPositionSize(int x, int y, int w, int h) => SetPositionSize(new Position(x, y), new Size(w,h));

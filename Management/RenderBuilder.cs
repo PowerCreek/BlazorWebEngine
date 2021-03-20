@@ -1,5 +1,7 @@
 ﻿using System;
 using BlazorWebEngine.Classes;
+using BlazorWebEngine.Classes.Contexts;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 
 namespace BlazorWebEngine.Management
@@ -15,6 +17,14 @@ namespace BlazorWebEngine.Management
             RenderTreeBuilder.OpenElement(index++, elementType);
             return this;
         }
+        
+        public RenderBuilder Open<C>(RenderTreeBuilder renderTreeBuilder) where C: ComponentBase
+        {
+            index = renderTreeBuilder.GetFrames().Count;
+            RenderTreeBuilder = renderTreeBuilder;
+            RenderTreeBuilder.OpenComponent<C>(index++);
+            return this;
+        }
 
         public RenderBuilder WithAttribute(string key, string value)
         {
@@ -25,6 +35,12 @@ namespace BlazorWebEngine.Management
         public RenderBuilder WithStyles(StyleContext styleContext)
         {
             RenderTreeBuilder.AddAttribute(index++, "style", styleContext.GetRenderOutput());
+            return this;
+        }
+
+        public RenderBuilder WithReference(string key, object obj)
+        {
+            RenderTreeBuilder.AddAttribute(index++, key, obj);
             return this;
         }
 
@@ -58,6 +74,11 @@ namespace BlazorWebEngine.Management
         public RenderBuilder End()
         {
             RenderTreeBuilder.CloseElement();
+            return this;
+        }
+        public RenderBuilder End<C>()
+        {
+            RenderTreeBuilder.CloseComponent();
             return this;
         }
     }
