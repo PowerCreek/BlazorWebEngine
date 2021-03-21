@@ -1,9 +1,8 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Dynamic;
+using System.Collections.Specialized;
 using System.Threading.Tasks;
-using BlazorWebEngine.Classes;
 using BlazorWebEngine.Classes.Contexts;
+using BlazorWebEngine.Classes.Types.Vector;
 using BlazorWebEngine.Components;
 using BlazorWebEngine.Interfaces;
 using BlazorWebEngine.Management;
@@ -17,103 +16,81 @@ namespace BlazorWebEngine.CustomNodes
 {
     public class CodedNode : NodeBase, IRenderable
     {
-        public StyleOperator StyleOperator;
-        
-        public RenderBuilder RenderBuilder = new RenderBuilder();
-        
-        public ElementContext Header {get;set;}
-        public ElementContext Center {get;set;}
-        
+        public RenderBuilder RenderBuilder = new();
+        public readonly StyleOperator StyleOperator;
+
         public CodedNode(
-            IElementServices elementServices) : 
+            IElementServices elementServices) :
             base(elementServices)
         {
             StyleOperator = ElementServices.OperationManager.GetOperation<StyleOperator>();
         }
 
-        public override void Instantiate()
-        {
-            StyleContext headerStyle = new StyleContext();
-
-            Header = ElementServices.ElementContextProvider.AddContext(new ElementContext(
-                $"header_{Id}",
-                (builder) =>
-                {
-                    builder.Add<Transform>("Transform", out Transform transform)
-                        .Add("StyleContext", headerStyle);
-
-                    headerStyle.AddStyle(StyleOperator,
-                        builder.Id,
-                        ("background-color","red"),
-                        ("position","absolute"),
-                        ("width","100px"),
-                        ("height","100px"));
-                    
-                    transform.OnMove = (a, b) => headerStyle.AddStyle(StyleOperator, builder.Id, 
-                        ("left",$"{b.X}px"),
-                        ("top",$"{b.Y}px"));
-                    
-                    transform.OnResize = (a, b) => headerStyle.AddStyle(StyleOperator, builder.Id, 
-                        ("width",$"{b.Width}px"),
-                        ("height",$"{b.Height}px"));
-
-                    transform.Position = new Position(100,300); }));
-            
-            Header.RenderElement = builder => RenderBuilder.Open<TestComp>(builder)
-                .WithAttribute("id",Header.Id)
-                //.WithStyles(Header.Get<StyleContext>("StyleContext"))
-                .End<TestComp>();
-            
-            StyleContext centerStyle = new StyleContext();
-
-            Center = ElementServices.ElementContextProvider.AddContext(new ElementContext(
-                $"center_{Id}",
-                (builder) =>
-                {
-                    builder.Add<Transform>("Transform", out Transform transform)
-                        .Add("StyleContext", centerStyle);
-
-                    centerStyle.AddStyle(StyleOperator,
-                        builder.Id,
-                        ("background-color","red"),
-                        ("position","absolute"),
-                        ("width","100px"),
-                        ("height","100px"));
-                    
-                    transform.OnMove = (a, b) => centerStyle.AddStyle(StyleOperator, builder.Id, 
-                        ("left",$"{b.X}px"),
-                        ("top",$"{b.Y}px"));
-                    
-                    transform.OnResize = (a, b) =>
-                    {
-                        centerStyle.AddStyle(StyleOperator, builder.Id,
-                            ("width", $"{b.Width}px"),
-                            ("height", $"{b.Height}px"));
-                    };
-
-                    transform.Position = new Position(300,300);
-                    Task.Run(async () =>
-                    {
-                        await Task.Delay(3000);
-                        transform.Position = new Position(500, 500);
-                        ElementServices.ComponentMap.GetComponent<Basic>(Center.Id)?.TriggerStateChanged();
-                        
-                        await Task.Delay(3000);
-                        transform.Position.X = 100;
-                        ElementServices.ComponentMap.GetComponent<Basic>(Center.Id)?.TriggerStateChanged();
-                    });
-
-                }));            
-            
-            Center.RenderElement = builder => RenderBuilder.Open<TestComp>(builder)
-                .WithAttribute("id",Center.Id)
-                .End<TestComp>();
-        }
+        public ElementContext Header { get; set; }
+        public ElementContext Center { get; set; }
 
         public void RenderOutline(RenderTreeBuilder builder)
         {
-            Header.RenderElement(builder);
-            Center.RenderElement(builder);
+            RenderBuilder.index = 0;
+            Header.BuildRenderFragment(RenderBuilder, builder);
+        }
+
+        public override void Instantiate()
+        {
+            Header = ElementServices.ElementContextProvider.AddContext(new ElementContext($"header_{Id}", b=>
+            {
+                b.Add("Transform", out Transform transform)
+                    .Add("Style", out StyleContext styleContext);
+
+                styleContext.AddStyle(StyleOperator, b, 
+                    ("position","absolute"),
+                    ("background-color","blue"),
+                    ("left","100px"),
+                    ("top","400px"),
+                    ("width","100px"),
+                    ("height","100px")
+                    );
+
+                b.OnBuild += (ctx, bld) =>
+                {
+                    bld.WithAttribute("style", styleContext.GetRenderOutput());
+                };
+                
+            })); 
+            
+            Center = ElementServices.ElementContextProvider.AddContext(new ElementContext($"center{Id}", b=>
+            {
+                b.Add("Transform", out Transform transform)
+                    .Add("Style", out StyleContext styleContext);
+
+                styleContext.AddStyle(StyleOperator, b, 
+                    ("position","absolute"),
+                    ("background-color","red"),
+                    ("left","100px"),
+                    ("top","100px"),
+                    ("width","100px"),
+                    ("height","100px")
+                    );
+
+                b.OnBuild += (ctx, bld) =>
+                {
+                    bld.WithAttribute("style", styleContext.GetRenderOutput());
+                };
+            }));
+
+            Header.AddChild(Center);
+
+            Task.Run(async () =>
+            {
+                await Task.Delay(3000);
+                
+                Header.Get<StyleContext>("Style").AddStyle(StyleOperator, Header,
+                    ("background-color","black"));
+                
+                await Task.Delay(3000);
+                Header.StateComponentReference.Reset();
+            });
+
         }
     }
 }

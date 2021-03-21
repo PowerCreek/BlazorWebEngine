@@ -2,11 +2,9 @@
 {
     public class ElementProp
     {
-        
     }
-    
-    public class ElementProp<T> 
+
+    public class ElementProp<T>
     {
-        
     }
 }

@@ -2,7 +2,7 @@
 {
     public class Node
     {
-        public int Id { get; init; }
         public int ParentId;
+        public int Id { get; init; }
     }
 }

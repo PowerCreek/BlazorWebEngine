@@ -1,5 +1,4 @@
 ﻿using System;
-using BlazorWebEngine.Classes;
 using BlazorWebEngine.Classes.Contexts;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
@@ -8,17 +7,17 @@ namespace BlazorWebEngine.Management
 {
     public class RenderBuilder
     {
-        public int index = 0;
-        public  RenderTreeBuilder RenderTreeBuilder;
-        
+        public int index;
+        public RenderTreeBuilder RenderTreeBuilder;
+
         public RenderBuilder Open(RenderTreeBuilder renderTreeBuilder, string elementType)
         {
             RenderTreeBuilder = renderTreeBuilder;
             RenderTreeBuilder.OpenElement(index++, elementType);
             return this;
         }
-        
-        public RenderBuilder Open<C>(RenderTreeBuilder renderTreeBuilder) where C: ComponentBase
+
+        public RenderBuilder Open<C>(RenderTreeBuilder renderTreeBuilder) where C : ComponentBase
         {
             index = renderTreeBuilder.GetFrames().Count;
             RenderTreeBuilder = renderTreeBuilder;
@@ -27,6 +26,12 @@ namespace BlazorWebEngine.Management
         }
 
         public RenderBuilder WithAttribute(string key, string value)
+        {
+            RenderTreeBuilder.AddAttribute(index++, key, value);
+            return this;
+        }
+
+        public RenderBuilder WithAttribute(string key, object value)
         {
             RenderTreeBuilder.AddAttribute(index++, key, value);
             return this;
@@ -44,15 +49,18 @@ namespace BlazorWebEngine.Management
             return this;
         }
 
-        public RenderBuilder WithAttribute(params (string key, string value)[] attr)
+        public RenderBuilder SetReferenceElement(Action<ElementReference> referral)
         {
-            foreach ((string key, string value) in attr)
-            {
-                WithAttribute(key, value);
-            }
+            RenderTreeBuilder.AddElementReferenceCapture(index++, referral);
             return this;
         }
-        
+
+        public RenderBuilder WithAttribute(params (string key, string value)[] attr)
+        {
+            foreach ((var key, var value) in attr) WithAttribute(key, value);
+            return this;
+        }
+
         public RenderBuilder WithKey(string key)
         {
             RenderTreeBuilder.SetKey(key);
@@ -61,7 +69,7 @@ namespace BlazorWebEngine.Management
 
         public RenderBuilder WithContent(string content)
         {
-            RenderTreeBuilder.AddContent(index++,content);
+            RenderTreeBuilder.AddContent(index++, content);
             return this;
         }
 
@@ -76,6 +84,7 @@ namespace BlazorWebEngine.Management
             RenderTreeBuilder.CloseElement();
             return this;
         }
+
         public RenderBuilder End<C>()
         {
             RenderTreeBuilder.CloseComponent();

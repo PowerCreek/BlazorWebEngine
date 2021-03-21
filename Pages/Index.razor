@@ -1,13 +1,17 @@
 ﻿@page "/"
-@using BlazorWebEngine.Classes
 @using BlazorWebEngine.Components
 
-<div>
-@{ @RootComponent.RenderNodes();}
+<div >
+    @{
+        @RootComponent.RenderNodes()
+    }
 </div>
+
+
 
 @code
 {
+    
     [Inject]
     public RootComponent RootComponent { get; set; }
 

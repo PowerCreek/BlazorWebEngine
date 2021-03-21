@@ -5,20 +5,20 @@ namespace BlazorWebEngine.Management.ElementManagement.ElementProperties
 {
     public class ElementProperties
     {
-        public string Id { get; init; }
+        public Dictionary<string, object> ContextItemMap = new();
 
         public ElementProperties(string id)
         {
             Id = id;
         }
-        
-        public Dictionary<string, object> ContextItemMap = new();
+
+        public string Id { get; init; }
 
         public T Get<T>(string name)
         {
             return (T) ContextItemMap[name];
         }
-        
+
         public ElementProperties Add<T>(string name, out T item)
         {
             ContextItemMap.Add(name, item = Activator.CreateInstance<T>());

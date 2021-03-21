@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BlazorWebEngine.Management.ElementManagement;
+using Microsoft.AspNetCore.Components;
 
 namespace BlazorWebEngine.Components
 {
@@ -7,20 +8,20 @@ namespace BlazorWebEngine.Components
     {
         public Dictionary<string, ElementContext> ContextMap { get; set; } = new();
 
-        public ElementContextProvider()
-        {
-            
-        }
-
         public ElementContext AddContext(ElementContext context)
         {
             ContextMap.Add(context.Id, context);
             return context;
         }
         
-        public ElementContext GetContext(string id) => ContextMap[id];
+        public ElementContext GetContext(string id)
+        {
+            return ContextMap[id];
+        }
 
-        public T GetElementProperty<T>(string id, string propName) => GetContext(id).Get<T>(propName);
-        
+        public T GetElementProperty<T>(string id, string propName)
+        {
+            return GetContext(id).Get<T>(propName);
+        }
     }
 }

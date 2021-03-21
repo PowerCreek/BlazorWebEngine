@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection.Metadata;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace BlazorWebEngine.Management.OperationHandling
 {
-  
     public class StyleOperator : OperationBase
     {
-        public StyleOperator StyleOp { get; init; }
         public StyleOperator(IJSRuntime jsRuntime) : base(jsRuntime)
         {
-            
         }
-        
+
         public override void MakeOperator()
         {
             Console.WriteLine(nameof(StyleOperator));
@@ -24,12 +20,14 @@ namespace BlazorWebEngine.Management.OperationHandling
             JsRuntime.InvokeVoidAsync("SetStyles", id, styleKey, value);
         }
 
+        public void SetStyle(ElementReference elem, string key, string value)
+        {
+            JsRuntime.InvokeVoidAsync("SetStylesByReference", elem, key, value);
+        }
+
         public void SetStyle(string id, params (string key, string val)[] args)
         {
-            foreach ((string key,string val) in args)
-            {
-                SetStyle(id, key, val);
-            }
+            foreach (var (key, val) in args) SetStyle(id, key, val);
         }
     }
 }

@@ -4,12 +4,12 @@ namespace BlazorWebEngine.Management.NodeHandling
 {
     public class NodeRegistry : IRegisterElement
     {
-        public int Indexor = 0;
-        public readonly HashSet<int> ElementMap = new HashSet<int>();
-        
+        public readonly HashSet<int> ElementMap = new();
+        public int Indexor;
+
         public virtual int AddNode()
         {
-            int id = Indexor++;
+            var id = Indexor++;
             ElementMap.Add(id);
             return id;
         }
