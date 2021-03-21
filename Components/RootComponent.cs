@@ -10,7 +10,7 @@ namespace BlazorWebEngine.Components
         
         public RootComponent(NodeManager nodeManager)
         {
-            RootItem = nodeManager.GenerateItem<CodedNode>();      
+            RootItem = nodeManager.GenerateItem<CodedNode>();
         }
         
         public RenderFragment RenderNodes()

@@ -11,9 +11,7 @@ namespace BlazorWebEngine.Management.ElementManagement.ElementProperties
 
     public abstract class ActionCall
     {
-
         public abstract void SetParameters(object a, object b);
-
     }
     
     public class ActionCall<T,V> : ActionCall where T: class 
@@ -39,18 +37,14 @@ namespace BlazorWebEngine.Management.ElementManagement.ElementProperties
     
     public class ElementProperty<T> where T: class
     {
-
         public Dictionary<string, ActionCall> PropertyChangedMap = new();
-
         
         public ActionCall<T,V> GetPropertyActionCall<V>()
         {
             string name = new StackTrace().GetFrame(1)?.GetMethod()?.Name.Split('_')[1];
             if (PropertyChangedMap.TryGetValue(name, out var hold))
-            {
-                return hold as ActionCall<T,V>;
-            }
-            
+                return hold as ActionCall<T, V>;
+
             var action = Activator.CreateInstance<ActionCall<T,V>>();
             PropertyChangedMap.Add(name, action);
             
@@ -70,8 +64,6 @@ namespace BlazorWebEngine.Management.ElementManagement.ElementProperties
             values[0] = a;
             values[1] = b;
         }
-        
-        
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

@@ -56,7 +56,7 @@ namespace BlazorWebEngine.Classes.Contexts
         
         private string CreateOutput()
         {
-            Output = string.Join(';', StyleMap.Select(e => $"{e.Key}:{e.Value}"));
+            Output = string.Join(';', StyleMap.Select(e => $"{e.Key}: {e.Value}"));
             //Console.WriteLine(Output);
             return Output;
         }

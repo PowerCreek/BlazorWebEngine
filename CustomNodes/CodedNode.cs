@@ -18,6 +18,7 @@ namespace BlazorWebEngine.CustomNodes
     public class CodedNode : NodeBase, IRenderable
     {
         public StyleOperator StyleOperator;
+        
         public RenderBuilder RenderBuilder = new RenderBuilder();
         
         public ElementContext Header {get;set;}
@@ -52,9 +53,9 @@ namespace BlazorWebEngine.CustomNodes
                         ("left",$"{b.X}px"),
                         ("top",$"{b.Y}px"));
                     
-                    transform.OnResize += (a, b) => headerStyle.AddStyle(StyleOperator, builder.Id, 
-                        ("left",$"{b.Width}px"),
-                        ("top",$"{b.Height}px"));
+                    transform.OnResize = (a, b) => headerStyle.AddStyle(StyleOperator, builder.Id, 
+                        ("width",$"{b.Width}px"),
+                        ("height",$"{b.Height}px"));
 
                     transform.Position = new Position(100,300); }));
             
@@ -86,8 +87,8 @@ namespace BlazorWebEngine.CustomNodes
                     transform.OnResize = (a, b) =>
                     {
                         centerStyle.AddStyle(StyleOperator, builder.Id,
-                            ("left", $"{b.Width}px"),
-                            ("top", $"{b.Height}px"));
+                            ("width", $"{b.Width}px"),
+                            ("height", $"{b.Height}px"));
                     };
 
                     transform.Position = new Position(300,300);
@@ -95,7 +96,10 @@ namespace BlazorWebEngine.CustomNodes
                     {
                         await Task.Delay(3000);
                         transform.Position = new Position(500, 500);
+                        ElementServices.ComponentMap.GetComponent<Basic>(Center.Id)?.TriggerStateChanged();
                         
+                        await Task.Delay(3000);
+                        transform.Position.X = 100;
                         ElementServices.ComponentMap.GetComponent<Basic>(Center.Id)?.TriggerStateChanged();
                     });
 

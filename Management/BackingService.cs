@@ -20,11 +20,11 @@ namespace BlazorWebEngine.Management
     public class BackingService : IElementServices
     {
         private static int _id = 0;
-
         public int id { get; } = _id++;
         
         public ComponentMap ComponentMap { get; init; }
         public OperationManager OperationManager { get; init; }
+        
         public NodeManager NodeManager { get; init; }
         public NodeRegistry NodeRegistry { get; init; }
         public NodeInformation NodeInformation { get; init; }

@@ -12,7 +12,7 @@ namespace BlazorWebEngine.Management.NodeHandling
         public NodeBase(IElementServices elementServices)
         {
             Id = elementServices.NodeRegistry.AddNode();
-            ElementServices = elementServices as IElementServices;
+            ElementServices = elementServices;
         }
         
         public virtual void Instantiate()
