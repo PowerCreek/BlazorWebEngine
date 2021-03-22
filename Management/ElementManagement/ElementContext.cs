@@ -28,7 +28,6 @@ namespace BlazorWebEngine.Management.ElementManagement
     {
 
         public ElementEventHandler ElementEventHandler { get; init; } = new();
-        
         public StateComponent StateComponentReference { get; set; }
         public ElementReference ElementReference { get; set; }
         public Dictionary<ElementContext,ElementContext> Children { get; set; } = new();

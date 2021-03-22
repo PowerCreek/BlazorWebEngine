@@ -57,7 +57,7 @@ namespace BlazorWebEngine.Management
 
         public RenderBuilder WithAttribute(params (string key, string value)[] attr)
         {
-            foreach ((var key, var value) in attr) WithAttribute(key, value);
+            foreach (var (key, value) in attr) WithAttribute(key, value);
             return this;
         }
 
