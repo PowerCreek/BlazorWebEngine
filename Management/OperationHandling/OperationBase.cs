@@ -12,7 +12,6 @@ namespace BlazorWebEngine.Management.OperationHandling
 
         public OperationBase()
         {
-            
         }
 
         public IJSRuntime JsRuntime { get; init; }

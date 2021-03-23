@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using BlazorWebEngine.Management.ElementManagement;
-using Microsoft.AspNetCore.Components;
 
 namespace BlazorWebEngine.Components
 {
@@ -13,7 +12,7 @@ namespace BlazorWebEngine.Components
             ContextMap.Add(context.Id, context);
             return context;
         }
-        
+
         public ElementContext GetContext(string id)
         {
             return ContextMap[id];

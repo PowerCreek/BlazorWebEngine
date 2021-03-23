@@ -2,6 +2,7 @@
 using BlazorWebEngine.Classes.Contexts;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace BlazorWebEngine.Management
 {
@@ -13,6 +14,12 @@ namespace BlazorWebEngine.Management
         public RenderBuilder Open(RenderTreeBuilder renderTreeBuilder, string elementType)
         {
             RenderTreeBuilder = renderTreeBuilder;
+            RenderTreeBuilder.OpenElement(index++, elementType);
+            return this;
+        }
+        
+        public RenderBuilder Open(string elementType)
+        {
             RenderTreeBuilder.OpenElement(index++, elementType);
             return this;
         }
@@ -28,6 +35,12 @@ namespace BlazorWebEngine.Management
         public RenderBuilder WithAttribute(string key, string value)
         {
             RenderTreeBuilder.AddAttribute(index++, key, value);
+            return this;
+        }
+
+        public RenderBuilder WithEventListener(string key, Action action)
+        {
+            RenderTreeBuilder.AddAttribute(index++, key, EventCallback.Factory.Create(this, (a) => { action(); }));
             return this;
         }
 

@@ -43,10 +43,8 @@ namespace BlazorWebEngine.Management.ElementManagement.ElementProperties
                 _position.PropertyChanged += (a, b) =>
                 {
                     OnMove?.Invoke(this, _position);
-                    Console.WriteLine("setting property of position");
                 };
                 OnMove?.Invoke(this, _position);
-                Console.WriteLine("setting position");
             }
         }
 

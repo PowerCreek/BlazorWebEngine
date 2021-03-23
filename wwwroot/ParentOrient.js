@@ -1,7 +1,9 @@
 ﻿console.log("loaded")
 
-function SetParent(parentSelector, childSelector){
-    document.getElementById(parentSelector).appendChild(document.getElementById(childSelector))
+function SetParent(parent, child){
+    console.log(parent)
+    console.log(child)
+    parent.appendChild(child)
 }
 
 function SetStyles(elementId, styleKey, styleValue){
@@ -9,6 +11,5 @@ function SetStyles(elementId, styleKey, styleValue){
 }
 
 function SetStylesByReference(element, styleKey, styleValue){
-    console.log(styleKey[0])
     element.style[styleKey]=styleValue
 }
