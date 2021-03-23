@@ -6,7 +6,7 @@
         {
         }
 
-        public Position(int x, int y) : base(x, y)
+        public Position(int x, int y) : base(x,y)
         {
         }
 

@@ -11,7 +11,7 @@ namespace BlazorWebEngine.CustomElementContexts
         public ContainerContext Container;
         public BodyContextExample(NodeBase nodeBase) : base($"Body{nodeBase.Id}", nodeBase)
         {
-            AddAttribute("Style", out StyleContext styleContext);
+            WithAttribute("Style", out StyleContext styleContext);
             styleContext.WithStyle(nodeBase.ElementServices.OperationManager.GetOperation<StyleOperator>(),
                 this,
                 ("position", "absolute"),

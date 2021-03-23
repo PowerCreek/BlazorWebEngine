@@ -29,7 +29,7 @@ namespace BlazorWebEngine.CustomElementContexts
         
         public NoteTab(NodeBase nodeBase) : base(nodeBase)
         {
-            AddAttribute("Style", out StyleContext styleContext);
+            WithAttribute("Style", out StyleContext styleContext);
             styleContext.WithStyle(StyleOperator,
                 this,
                 ("position", "relative"),
@@ -46,7 +46,7 @@ namespace BlazorWebEngine.CustomElementContexts
         
         public NoteTab2(NodeBase nodeBase) : base(nodeBase)
         {
-            AddAttribute("Style", out StyleContext styleContext);
+            WithAttribute("Style", out StyleContext styleContext);
             styleContext.WithStyle(StyleOperator,
                 this,
                 ("position", "relative"),

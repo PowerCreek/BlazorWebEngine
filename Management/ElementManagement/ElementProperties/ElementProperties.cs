@@ -24,7 +24,15 @@ namespace BlazorWebEngine.Management.ElementManagement.ElementProperties
 
         public T Get<T>(string name)
         {
-            return (T) ContextItemMap[name];
+            if (ContextItemMap.ContainsKey(name))
+            {
+                return (T) ContextItemMap[name];
+            }
+            else
+            {
+                Add<T>(name, out T item);
+                return item;
+            }
         }
 
         public ElementProperties Add<T>(string name, out T item)
@@ -33,15 +41,18 @@ namespace BlazorWebEngine.Management.ElementManagement.ElementProperties
             return this;
         }
 
-        public ElementProperties AddAttribute<T>(string name, out T iAttribute) where T : IAttribute
+        public ElementProperties WithAttribute<T>(string name, out T iAttribute) where T : IAttribute
         {
-            AttributeMap.Add(name, iAttribute = Activator.CreateInstance<T>());
+            if (AttributeMap.ContainsKey(name))
+            {
+                iAttribute = (T) AttributeMap[name];
+            }
+            else
+            {
+                AttributeMap.Add(name, iAttribute = Activator.CreateInstance<T>());
+            }
+            
             return this;
-        }
-
-        public A GetAttribute<A>(string name) where A : IAttribute
-        {
-            return (A) AttributeMap[name];
         }
 
         public void RemoveAttribute(string name)

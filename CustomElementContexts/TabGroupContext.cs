@@ -6,6 +6,7 @@ using BlazorWebEngine.Management;
 using BlazorWebEngine.Management.ElementManagement;
 using BlazorWebEngine.Management.NodeHandling;
 using BlazorWebEngine.Management.OperationHandling;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace BlazorWebEngine.CustomElementContexts
 {
@@ -28,7 +29,7 @@ namespace BlazorWebEngine.CustomElementContexts
         public TabGroupContext(NodeBase nodeBase) : base($"TabGroup{nodeBase.Id}", nodeBase)
         {
             
-            AddAttribute("Style", out StyleContext styleContext);
+            WithAttribute("Style", out StyleContext styleContext);
             styleContext.WithStyle(StyleOperator=nodeBase.ElementServices.OperationManager.GetOperation<StyleOperator>(),
                 this,
                 ("position", "relative"),
@@ -42,8 +43,12 @@ namespace BlazorWebEngine.CustomElementContexts
             );
             //position: relative;background-color: green;width: 100%;display: grid;grid-auto-columns: min-content;
             //overflow: hidden;grid-auto-flow: column;min-height: 30px
-
-            OnBuild = RenderTabs;
+            OnBeforeBuild = (context, builder) =>
+            {
+                builder.WithAttribute("draggable", "false");
+            };
+            
+            OnAfterBuild = RenderTabs;
         }
 
         public Action<TabData> OnTabSelected { get; set; }
@@ -56,6 +61,7 @@ namespace BlazorWebEngine.CustomElementContexts
             {
                 builder.Open(builder.RenderTreeBuilder, "div");
                 builder.WithAttribute("class", "tab");
+                builder.WithAttribute("draggable", "true");
                 builder.WithAttribute("style",
                     $"place-self: center; background-color: cyan; margin: 2px 4px; border: 2px solid {(tab==SelectedTab?"white":"gray")};");
                 
@@ -63,6 +69,9 @@ namespace BlazorWebEngine.CustomElementContexts
                 builder.WithEventListener("onmousedown", () => { OnTabDown(tab); });
                 builder.WithEventListener("onmouseup", () => { OnTabUp(tab); });
                 builder.WithEventListener("onmouseleave", () => { OnTabLeave(tab); });
+                
+                builder.RenderTreeBuilder.AddEventStopPropagationAttribute(builder.index++, "onmousemove", true);
+                
                 
                 builder.WithContent(tab.TabContext.Id[^6..]);
                 builder.End();

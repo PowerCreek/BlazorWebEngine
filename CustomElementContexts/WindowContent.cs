@@ -17,13 +17,14 @@ namespace BlazorWebEngine.CustomElementContexts
         {
             AssignOperator = nodeBase.ElementServices.OperationManager.GetOperation<ElementAssociationOperator>();
             
-            AddAttribute("Style", out StyleContext styleContext);
+            WithAttribute("Style", out StyleContext styleContext);
             styleContext.WithStyle(StyleOperator = nodeBase.ElementServices.OperationManager.GetOperation<StyleOperator>(),
                 this,
                 ("position", "relative"),
                 ("background-color", "white"),
                 ("place-self","stretch")
             );
+
         }
 
         public void SetChild(TabContext tabContext)

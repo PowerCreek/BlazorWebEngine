@@ -10,9 +10,9 @@ namespace BlazorWebEngine.Management.ElementManagement
 {
     public class ElementEventHandler
     {
-        public Dictionary<string, Action<EventArgs>> EventMap { get; set; } = new();
+        public Dictionary<string, Action<dynamic>> EventMap { get; set; } = new();
 
-        public void AddEvent(string key, Action<EventArgs> eventCallback)
+        public void AddEvent(string key, Action<dynamic> eventCallback)
         {
             if (!EventMap.TryAdd(key, eventCallback)) EventMap[key] += eventCallback;
         }
@@ -22,9 +22,12 @@ namespace BlazorWebEngine.Management.ElementManagement
     {
         private static int _id;
         
-        public Action<ElementContext, RenderBuilder> OnBuild = (_, _) => { };
+        public string CssClass { get; set; }
+        
+        public Action<ElementContext, RenderBuilder> OnBeforeBuild = (_, _) => { };
+        public Action<ElementContext, RenderBuilder> OnAfterBuild = (_, _) => { };
 
-        protected ElementContext(string id, NodeBase nodeBase) : base(id = $"{id}_{_id++}")
+        public ElementContext(string id, NodeBase nodeBase) : base(id = $"{id}_{_id++}")
         {
             NodeBase = nodeBase;
         }
@@ -85,7 +88,13 @@ namespace BlazorWebEngine.Management.ElementManagement
         {
             builder.Open(treeBuilder, "div");
             builder.WithAttribute("id", Id);
+            if (CssClass != null)
+            {
+                builder.WithAttribute("class", CssClass);
+            }
 
+            OnBeforeBuild(this, builder);
+            
             foreach (var (key, val) in ElementEventHandler.EventMap)
                 builder.WithAttribute(key, EventCallback.Factory.Create(this, val));
 
@@ -95,7 +104,7 @@ namespace BlazorWebEngine.Management.ElementManagement
 
             builder.SetReferenceElement(e => ElementReference = e);
             
-            OnBuild(this, builder);
+            OnAfterBuild(this, builder);
 
             Children.Keys.ToList().ForEach(
                 e => e.BuildRenderFragment(builder, treeBuilder));
@@ -104,7 +113,7 @@ namespace BlazorWebEngine.Management.ElementManagement
         }
     }
 
-    public class StateComponent : ComponentBase
+    public class StateComponent : ComponentBase, IDisposable
     {
         [Parameter] public ElementContext ElementContext { get; set; }
 
@@ -122,6 +131,11 @@ namespace BlazorWebEngine.Management.ElementManagement
         protected override void OnAfterRender(bool firstRender)
         {
             DoAfterRender?.Invoke(this);
+        }
+
+        public void Dispose()
+        {
+            GC.Collect();
         }
     }
 }

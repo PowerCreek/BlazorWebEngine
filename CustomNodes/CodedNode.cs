@@ -17,9 +17,6 @@ namespace BlazorWebEngine.CustomNodes
         {
         }
 
-        public ElementContext Header { get; set; }
-        public ElementContext Center { get; set; }
-
         public void RenderOutline(RenderTreeBuilder builder)
         {
             ElementServices.RenderBuilder.index = 0;

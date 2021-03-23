@@ -4,10 +4,13 @@ using System.Linq;
 using BlazorWebEngine.Classes.Contexts;
 using BlazorWebEngine.Classes.Types.Vector;
 using BlazorWebEngine.CustomNodes;
+using BlazorWebEngine.Interfaces;
+using BlazorWebEngine.Management;
 using BlazorWebEngine.Management.ElementManagement;
 using BlazorWebEngine.Management.ElementManagement.ElementProperties;
 using BlazorWebEngine.Management.NodeHandling;
 using BlazorWebEngine.Management.OperationHandling;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace BlazorWebEngine.CustomElementContexts
 {
@@ -17,12 +20,27 @@ namespace BlazorWebEngine.CustomElementContexts
         
         public readonly Transform Transform;
         public StyleOperator StyleOperator { get; init; }
+        
+        public TitlebarContext TitlebarContext { get; init; }
         public TabGroupContext TabGroupContext { get; init; }
         public WindowContent WindowContent { get; init; }
         
         public WindowContext(NodeBase nodeBase) : base($"Window{nodeBase.Id}", nodeBase)
         {
             WindowingService = nodeBase.ElementServices.OperationManager.GetOperation<WindowingService>();
+
+            CssClass = "window-context";
+            
+            AddChild(TitlebarContext = new TitlebarContext(NodeBase));
+            TitlebarContext.TitlebarMouseDown = args=>
+            {
+                Console.WriteLine("here");
+                WindowingService.WindowTitleBarDown(args, this);
+            };
+            TitlebarContext.TitlebarMouseUp = args=>
+            {
+                WindowingService.WindowTitleBarUp(args, this);
+            };
             
             AddChild(TabGroupContext = new TabGroupContext(NodeBase));
 
@@ -30,20 +48,11 @@ namespace BlazorWebEngine.CustomElementContexts
             
             AddChild(WindowContent = new WindowContent(NodeBase));
             
-            OnBuild += (context, builder) =>
-            {
-                builder.Open("div");
-                builder.WithAttribute("style", "position: relative; place-self: stretch; background-color: black");
-                builder.End();
-            };
+            WithAttribute("Style", out StyleContext styleContext);
             
-            AddAttribute("Style", out StyleContext styleContext);
             styleContext.WithStyle(StyleOperator=nodeBase.ElementServices.OperationManager.GetOperation<StyleOperator>(),
                 this,
-                ("position", "absolute"),
-                ("background-color", "red"),
-                ("display","grid"),
-                ("grid-template-rows","20px min-content auto")
+                ("position", "absolute")
             );
             
             Add("Transform", out Transform);
@@ -65,6 +74,41 @@ namespace BlazorWebEngine.CustomElementContexts
             
             Transform.Position = new Position(200, 200);
             Transform.Size = new Size(200, 300);
+
+            OnBeforeBuild += (a, b) =>
+            {
+                b.WithAttribute("tabindex", 0);
+                b.WithAttribute("draggable", false);
+                b.RenderTreeBuilder.AddEventPreventDefaultAttribute(b.index++, "ondragstart", true);
+                b.RenderTreeBuilder.AddEventPreventDefaultAttribute(b.index++, "ondragover", true);
+                
+                b.RenderTreeBuilder.AddEventStopPropagationAttribute(b.index++, "ondragstart", true);
+                b.RenderTreeBuilder.AddEventStopPropagationAttribute(b.index++, "ondragover", true);
+                
+                b.RenderTreeBuilder.AddEventStopPropagationAttribute(b.index++, "ondrop", true);
+                b.RenderTreeBuilder.AddEventStopPropagationAttribute(b.index++, "ondrop", true);
+                
+            };
+            
+            ElementEventHandler.AddEvent("onmousedown", OnMouseDown);
+            ElementEventHandler.AddEvent("onmouseup", WindowingService.WindowResizeUp);
+            ElementEventHandler.AddEvent("onmousemove", OnMouseMove);
+            ElementEventHandler.AddEvent("onmouseleave", OnMouseLeave);
+        }
+        
+        public void OnMouseDown(dynamic args)
+        {
+            WindowingService.WindowResizeDown(args, this);
+        }
+        
+        public void OnMouseMove(dynamic args)
+        {
+            WindowingService.WindowMouseMove(args, this);
+        }
+        
+        public void OnMouseLeave(dynamic args)
+        {
+            WindowingService.WindowMouseLeave(args);
         }
 
         public void OnTabSelected(TabData tabData)

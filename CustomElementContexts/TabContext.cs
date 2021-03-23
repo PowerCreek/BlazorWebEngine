@@ -20,13 +20,13 @@ namespace BlazorWebEngine.CustomElementContexts
         {
             if (show)
             {
-                GetAttribute<StyleContext>("Style")
-                    .WithoutStyles(StyleOperator, this, "display");
+                WithAttribute("Style", out StyleContext item);
+                    item.WithoutStyles(StyleOperator, this, "display");
             }
             else
             {
-                GetAttribute<StyleContext>("Style")
-                    .WithStyle(StyleOperator, this, ("display","none"));
+                WithAttribute("Style", out StyleContext item);
+                    item.WithStyle(StyleOperator, this, ("display","none"));
             }
         }
     }
