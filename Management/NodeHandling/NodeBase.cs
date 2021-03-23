@@ -1,10 +1,13 @@
 ﻿using System;
 using BlazorWebEngine.Interfaces;
+using BlazorWebEngine.Management.ElementManagement;
 
 namespace BlazorWebEngine.Management.NodeHandling
 {
     public class NodeBase : IInstance
     {
+        public ElementContext RootContext;
+
         public NodeBase(IElementServices elementServices)
         {
             Id = elementServices.NodeRegistry.AddNode();

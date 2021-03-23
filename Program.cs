@@ -29,6 +29,7 @@ namespace BlazorWebEngine
             builder.Services.AddScoped<NodeManager>();
             builder.Services.AddScoped<NodeRegistry>();
             builder.Services.AddScoped<NodeInformation>();
+            builder.Services.AddScoped<RenderBuilder>();
 
             builder.Services.AddScoped<RootComponent>();
 

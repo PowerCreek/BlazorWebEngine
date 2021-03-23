@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using BlazorWebEngine.Interfaces;
 
 namespace BlazorWebEngine.Management.ElementManagement.ElementProperties
 {
     public class ElementProperties
     {
+        public Dictionary<string, IAttribute> AttributeMap = new();
         public Dictionary<string, object> ContextItemMap = new();
 
         public ElementProperties(string id)
@@ -13,6 +15,12 @@ namespace BlazorWebEngine.Management.ElementManagement.ElementProperties
         }
 
         public string Id { get; init; }
+
+        public ElementProperties Add(string name, object data)
+        {
+            ContextItemMap.Add(name, data);
+            return this;
+        }
 
         public T Get<T>(string name)
         {
@@ -25,10 +33,20 @@ namespace BlazorWebEngine.Management.ElementManagement.ElementProperties
             return this;
         }
 
-        public ElementProperties Add(string name, object data)
+        public ElementProperties AddAttribute<T>(string name, out T iAttribute) where T : IAttribute
         {
-            ContextItemMap.Add(name, data);
+            AttributeMap.Add(name, iAttribute = Activator.CreateInstance<T>());
             return this;
+        }
+
+        public A GetAttribute<A>(string name) where A : IAttribute
+        {
+            return (A) AttributeMap[name];
+        }
+
+        public void RemoveAttribute(string name)
+        {
+            AttributeMap.Remove(name);
         }
     }
 }

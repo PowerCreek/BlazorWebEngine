@@ -13,6 +13,7 @@ namespace BlazorWebEngine.Management
         public NodeRegistry NodeRegistry { get; init; }
         public NodeInformation NodeInformation { get; init; }
         public ElementContextProvider ElementContextProvider { get; init; }
+        public RenderBuilder RenderBuilder { get; init; }
     }
 
     public class BackingService : IElementServices
@@ -25,14 +26,15 @@ namespace BlazorWebEngine.Management
             NodeInformation nodeInformation,
             OperationManager operationManager,
             ComponentMap componentMap,
-            ElementContextProvider elementContextProvider)
+            ElementContextProvider elementContextProvider,
+            RenderBuilder renderBuilder)
         {
             OperationManager = operationManager;
             NodeRegistry = nodeRegistry;
             NodeInformation = nodeInformation;
             ElementContextProvider = elementContextProvider;
             ComponentMap = componentMap;
-
+            RenderBuilder = renderBuilder;
             backBuilder.Build(this);
         }
 
@@ -45,5 +47,6 @@ namespace BlazorWebEngine.Management
         public NodeRegistry NodeRegistry { get; init; }
         public NodeInformation NodeInformation { get; init; }
         public ElementContextProvider ElementContextProvider { get; init; }
+        public RenderBuilder RenderBuilder { get; init; }
     }
 }

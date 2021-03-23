@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BlazorWebEngine.Interfaces;
 using BlazorWebEngine.Management.ElementManagement;
 using BlazorWebEngine.Management.OperationHandling;
-using Microsoft.AspNetCore.Components;
 
 namespace BlazorWebEngine.Classes.Contexts
 {
-    public class StyleContext
+    public class StyleContext : IRenderableItem, IAttribute
     {
         public bool Valid;
 
@@ -15,13 +15,19 @@ namespace BlazorWebEngine.Classes.Contexts
 
         private string Output { get; set; }
 
-        public void AddStyle(StyleOperator styleOperator, string ElementId, params (string, string)[] styles)
+        public object GetRenderOutput()
         {
-            foreach (var (key, value) in styles) AddStyle(styleOperator, ElementId, key, value);
+            Valid = true;
+            return Output;
+        }
+
+        public void WithStyle(StyleOperator styleOperator, string ElementId, params (string, string)[] styles)
+        {
+            foreach (var (key, value) in styles) WithStyle(styleOperator, ElementId, key, value);
             CreateOutput();
         }
-        
-        private void AddStyle(StyleOperator styleOperator, string ElementId, string key, string value)
+
+        private void WithStyle(StyleOperator styleOperator, string ElementId, string key, string value)
         {
             if (!StyleMap.ContainsKey(key))
             {
@@ -38,35 +44,45 @@ namespace BlazorWebEngine.Classes.Contexts
             }
         }
 
-        public void AddStyle(StyleOperator styleOperator, ElementContext elementContext, params (string, string)[] styles)
+        public void WithoutStyles(StyleOperator styleOperator, ElementContext elementContext, params string[] styles)
         {
-            foreach (var (key, value) in styles) AddStyle(styleOperator, elementContext, key, value);
+            Action Remove = () => { };
+            foreach (string key in styles)
+            {
+                string keyHold = $"{key}";
+                WithStyle(styleOperator, elementContext, key, "block");
+                Remove += () =>
+                {
+                    StyleMap.Remove(keyHold);
+                };
+            }
             CreateOutput();
+            Remove();
         }
         
-        private void AddStyle(StyleOperator styleOperator, ElementContext elementContext, string key, string value)
+        public void WithStyle(StyleOperator styleOperator, ElementContext elementContext,
+            params (string, string)[] styles)
+        {
+            foreach (var (key, value) in styles) WithStyle(styleOperator, elementContext, key, value);
+            CreateOutput();
+        }
+
+        private void WithStyle(StyleOperator styleOperator, ElementContext elementContext, string key, string value)
         {
             if (!StyleMap.ContainsKey(key))
             {
                 StyleMap.Add(key, value);
 
-                if (Equals(default,elementContext.ElementReference) || !Valid) return;
+                if (Equals(default, elementContext.ElementReference) || !Valid) return;
                 styleOperator.SetStyle(elementContext.ElementReference, key, value);
             }
             else
             {
-                if (!Equals(default,elementContext.ElementReference) && StyleMap[key] != value && Valid) 
+                if (!Equals(default, elementContext.ElementReference) && StyleMap[key] != value && Valid)
                     styleOperator.SetStyle(elementContext.ElementReference, key, value);
 
                 StyleMap[key] = value;
             }
-        }
-
-        public string GetRenderOutput()
-        {
-            Console.WriteLine("render");
-            Valid = true;
-            return Output;
         }
 
         public string CreateOutput()

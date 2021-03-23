@@ -6,4 +6,13 @@ namespace BlazorWebEngine.Interfaces
     {
         public void RenderOutline(RenderTreeBuilder builder);
     }
+
+    public interface IRenderableItem
+    {
+        public object GetRenderOutput();
+    }
+
+    public interface IAttribute
+    {
+    }
 }
