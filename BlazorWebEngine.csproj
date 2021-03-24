@@ -16,4 +16,13 @@
     <Folder Include="Parts" />
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="TestProject2\bin\Debug\net5.0\TestProject2.deps.json" />
+    <_ContentIncludedByDefault Remove="TestProject2\bin\Debug\net5.0\TestProject2.runtimeconfig.dev.json" />
+    <_ContentIncludedByDefault Remove="TestProject2\bin\Debug\net5.0\TestProject2.runtimeconfig.json" />
+    <_ContentIncludedByDefault Remove="TestProject2\obj\project.assets.json" />
+    <_ContentIncludedByDefault Remove="TestProject2\obj\project.packagespec.json" />
+    <_ContentIncludedByDefault Remove="TestProject2\obj\TestProject2.csproj.nuget.dgspec.json" />
+  </ItemGroup>
+
 </Project>

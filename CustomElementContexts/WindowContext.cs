@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Components.Web;
 
 namespace BlazorWebEngine.CustomElementContexts
 {
-    public class WindowContext : ElementContext
+   public class WindowContext : ElementContext
     {
         public WindowingService WindowingService { get; init; }
         
@@ -87,7 +87,6 @@ namespace BlazorWebEngine.CustomElementContexts
                 
                 b.RenderTreeBuilder.AddEventStopPropagationAttribute(b.index++, "ondrop", true);
                 b.RenderTreeBuilder.AddEventStopPropagationAttribute(b.index++, "ondrop", true);
-                
             };
             
             ElementEventHandler.AddEvent("onmousedown", OnMouseDown);

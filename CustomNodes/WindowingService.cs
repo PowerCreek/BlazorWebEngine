@@ -97,16 +97,13 @@ namespace BlazorWebEngine.CustomNodes
         {
             LeftMouseDown = true;
         }
-            
-        private int PastX = 0;
-        private int PastY = 0;
         
         public void ContainerMouseMove(dynamic args)
         {
-            
             if (CurrentScreenPos != null)
             {
-                BeforeScreenPos = new((int) args.ScreenX, (int) args.ScreenY);
+                //BeforeScreenPos = new((int) args.ScreenX, (int) args.ScreenY);
+                BeforeScreenPos = new((int) args.ClientX, (int) args.ClientY);
                 DeltaPos = new(CurrentScreenPos.X - BeforeScreenPos.X, CurrentScreenPos.Y - BeforeScreenPos.Y);
             }
 
@@ -120,57 +117,69 @@ namespace BlazorWebEngine.CustomNodes
 
             if (WindowDraggingWithResize != null && (DirX != 0 || DirY != 0) )
             {
-                var changeX = 0;
-                var changeW = 0;
-                var changeH = 0;
+                Position RPos = new Position(WindowDraggingWithResize.Transform.Position.X - CurrentScreenPos.X,
+                    WindowDraggingWithResize.Transform.Position.Y - CurrentScreenPos.Y);
+                
+                var changeX = WindowDraggingWithResize.Transform.Position.X;
+                var changeY = WindowDraggingWithResize.Transform.Position.Y;
+                var changeW = WindowDraggingWithResize.Transform.Size.Width;
+                var changeH = WindowDraggingWithResize.Transform.Size.Height;
+                
                 if (DirX == -1)
                 {
-                    Console.WriteLine(-1);
-                    changeX = DeltaPos.X;
-                    changeW = changeX;
-                    if ((DeltaPos.X+PastX) <= 0 && WindowDraggingWithResize.Transform.Size.Width <= MIN_WIDTH)
+                    int nX = CurrentScreenPos.X;
+                    int nW = WindowDraggingWithResize.Transform.Size.Width-(nX-WindowDraggingWithResize.Transform.Position.X);
+                    if (nW <= MIN_WIDTH)
                     {
-                        PastX += DeltaPos.X;
-                        changeW = changeX = 0;
-                        changeH = MIN_WIDTH-WindowDraggingWithResize.Transform.Size.Width;
+                        changeX += changeW-MIN_WIDTH;
+                        changeW = MIN_WIDTH;
+                    }
+                    else
+                    {
+                        changeX = CurrentScreenPos.X;
+                        changeW = nW;
                     }
                 }
-
                 if (DirX == 1)
                 {
-                    changeW = -DeltaPos.X;
-                    if((DeltaPos.X+PastX) >= 0 && WindowDraggingWithResize.Transform.Size.Width <= MIN_WIDTH)
-                    {
-                        PastX += DeltaPos.X;
-                        changeW = MIN_WIDTH-WindowDraggingWithResize.Transform.Size.Width;
-                    }
+                    int nX = CurrentScreenPos.X;
+                    int nW = CurrentScreenPos.X-changeX;
+                    changeW = nW <= MIN_WIDTH ? MIN_WIDTH : nW;
                 }
 
                 if (DirY == -1)
                 {
-                    //changeY = DeltaPos.Y;
-                    //changeH = changeY;
+                    int nY = CurrentScreenPos.Y;
+                    int nH = WindowDraggingWithResize.Transform.Size.Height-(nY-WindowDraggingWithResize.Transform.Position.Y);
+                    if (nH <= MIN_HEIGHT)
+                    {
+                        changeY += changeH-MIN_HEIGHT;
+                        changeH = MIN_HEIGHT;
+                    }
+                    else
+                    {
+                        changeY = CurrentScreenPos.Y;
+                        changeH = nH;
+                    }
                 }
 
                 if (DirY == 1)
                 {
-                    changeH = -DeltaPos.Y;
-                    if((DeltaPos.Y+PastY) >= 0 && WindowDraggingWithResize.Transform.Size.Height <= MIN_HEIGHT)
-                    {
-                        PastY += DeltaPos.Y;
-                        changeH = MIN_HEIGHT-WindowDraggingWithResize.Transform.Size.Height;
-                    }
+                    int nY = CurrentScreenPos.Y;
+                    int nH = CurrentScreenPos.Y-changeY;
+                    changeH = nH <= MIN_HEIGHT ? MIN_HEIGHT : nH;
                 }
 
                 if (DirX != 0)
                 {
-                    WindowDraggingWithResize.Transform.Position.X -= changeX;
-                    WindowDraggingWithResize.Transform.Size.Width += changeW;
+                    WindowDraggingWithResize.Transform.Position.X = changeX;
+                    WindowDraggingWithResize.Transform.Size.Width = changeW;
                 }
 
                 if (DirY != 0)
                 {
-                    WindowDraggingWithResize.Transform.Size.Height += changeH;
+                    WindowDraggingWithResize.Transform.Position.Y = changeY;
+                    WindowDraggingWithResize.Transform.Size.Height = changeH;
                 }
             }
         }
@@ -184,11 +193,13 @@ namespace BlazorWebEngine.CustomNodes
         {
             if (WindowDraggingWithResize == null) return;
                 WindowDraggingWithResize = null;
+                
+            ContainerContext.SetCursor("default");
         }
 
         public void StartDragAction(dynamic args)
         {
-            CurrentScreenPos = ScreenStartPos = new((int)args.ScreenX,(int)args.ScreenY);
+            CurrentScreenPos = ScreenStartPos = new((int)args.ClientX,(int)args.ClientY);
         }
 
         public void WindowTitleBarDown(dynamic args, WindowContext windowContext)
@@ -227,32 +238,45 @@ namespace BlazorWebEngine.CustomNodes
         
         public void WindowMouseMove(dynamic args, WindowContext windowContext)
         {
+            
             if (LeftMouseDown) return;
             if (args.Buttons != 0) return;
             
             DirX = 0;
             DirY = 0;
-            PastX = 0;
-            PastY = 0;
             
-            Position Offset = new((int)args.OffsetX,(int) args.OffsetY);
+            //Position Offset = new((int)args.ScreenX - windowContext.Transform.Position.X, 
+            //    (int) args.ScreenY - windowContext.Transform.Position.Y);
+            Position Offset = new((int)args.ClientX - windowContext.Transform.Position.X, 
+                (int) args.ClientY - windowContext.Transform.Position.Y);
+
             Size Bounds = windowContext.Transform.Size;
             
             string cursor = "";
 
-            if (Offset.X <= 0 || Offset.X >= Bounds.Width - 8)
+            int space = 4;
+
+            if (Offset.X <= space || Offset.X >= Bounds.Width - space)
             {
-                (cursor, DirX) = Offset.X <= 0 ? ("w", -1) : ("e", 1);
+                (cursor, DirX) = Offset.X <= space ? ("w", -1) : ("e", 1);
             }
 
-            if (Offset.Y <= 8 || Offset.Y >= Bounds.Height - 8)
+            if (Offset.Y <= space || Offset.Y >= Bounds.Height - space)
             {
-                (cursor, DirY) = Offset.Y <= 8 ? ("n" + cursor, -1) : ("s"+ cursor, 1) ;
+                if (DirX != 0 && Offset.Y <= space)
+                {
+                    (cursor, DirY) = ("n" + cursor, -1);
+                }
+
+                if (Offset.Y >= Bounds.Height - space)
+                {
+                    (cursor, DirY) = ("s" + cursor, 1);
+                }
             }
 
             if (cursor == "n")
             {
-                cursor = "";
+                //cursor = $"{cursor}-resize";
             }
             
             if (cursor != "")
@@ -270,19 +294,34 @@ namespace BlazorWebEngine.CustomNodes
                 ContainerContext.SetCursor(cursor);
             }
             LastCursor = cursor;
-            
         }
 
         public void WindowMouseLeave(dynamic args)
         {
-            if (LastCursor != "")
+            if (LastCursor != "" && !LeftMouseDown)
             {
                 LastCursor = "";
+                ContainerContext.SetCursor("default");
             }
-            ContainerContext.SetCursor("default");
         }
 
+        public void TabDragStart(dynamic args, TabData tabData)
+        {
+            Console.WriteLine("starting tab drag");
+        }
+        
+        public void TabDragEnd(dynamic args, TabData tabData)
+        {
+            Console.WriteLine("Ending tab drag");
+        }
+        
         //REGION//REGION//REGION//REGION
         #endregion
+
+        public bool IsMouseOverTabGroup = false; 
+        public void TabGroupMouseMove(object args)
+        {
+            IsMouseOverTabGroup = true;
+        }
     }
 }
